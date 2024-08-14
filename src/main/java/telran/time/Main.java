@@ -5,10 +5,12 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
-record MonthYear(int month, int year) {
-}
+record MonthYear(int month, int year) {}
 
 public class Main {
+
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_PINK = "\u001B[35m"; 
 
     public static void main(String[] args) {
         try {
@@ -35,13 +37,19 @@ public class Main {
         int firstDayOfWeek = date.getDayOfWeek().getValue();
         int offset = getOffset(firstDayOfWeek);
         int lastDay = date.lengthOfMonth();
+        LocalDate today = LocalDate.now();
 
         for (int i = 0; i < offset; i++) {
             System.out.print("     ");
         }
 
         for (int day = 1; day <= lastDay; day++) {
-            System.out.printf("%5d", day);
+            LocalDate currentDate = LocalDate.of(monthYear.year(), monthYear.month(), day);
+            if (currentDate.equals(today)) {
+                System.out.printf(ANSI_PINK + "%5d" + ANSI_RESET, day);
+            } else {
+                System.out.printf("%5d", day);
+            }
             if ((day + offset) % 7 == 0) {
                 System.out.println();
             }
@@ -55,12 +63,11 @@ public class Main {
             weekDays.append(String.format(" %4s", day.getDisplayName(TextStyle.SHORT, Locale.US)));
         }
         System.out.println(centerText(weekDays.toString()));
-        //System.out.println("  ----------------------------------");
         System.out.println(" ...................................");
     }
 
     private static void printTitle(MonthYear monthYear) {
-        String title = String.format("    %s %d", LocalDate.of(monthYear.year(), monthYear.month(), 1).getMonth().getDisplayName(TextStyle.FULL, Locale.US), monthYear.year());
+        String title = String.format("    %d %s", monthYear.year(), LocalDate.of(monthYear.year(), monthYear.month(), 1).getMonth().getDisplayName(TextStyle.FULL, Locale.US));
         System.out.println(centerText(title));
     }
 
